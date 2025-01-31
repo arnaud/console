@@ -1,0 +1,118 @@
+import { ConstArgumentNode, DocumentNode, Kind, StringValueNode } from 'graphql';
+import { FederatedLinkImport } from './link-import';
+import { FederatedLinkUrl } from './link-url';
+
+function linkFromArgs(args: readonly ConstArgumentNode[]): FederatedLink | undefined {
+  let url: FederatedLinkUrl | undefined,
+    imports: FederatedLinkImport[] = [],
+    as: string | null = null;
+  for (const arg of args) {
+    switch (arg.name.value) {
+      case 'url': {
+        url = FederatedLinkUrl.fromUrl((arg.value as StringValueNode).value);
+        break;
+      }
+      case 'import': {
+        imports = FederatedLinkImport.fromTypedefs(arg.value);
+        break;
+      }
+      case 'as': {
+        as = (arg?.value as StringValueNode | undefined)?.value ?? null;
+        break;
+      }
+      default: {
+        // console.warn('Unknown argument');
+      }
+    }
+  }
+  if (url !== undefined) {
+    return new FederatedLink(url, as, imports);
+  }
+  return;
+}
+
+function namespaced(namespace: string | null, name: string) {
+  if (namespace?.length) {
+    if (name.startsWith('@')) {
+      return `@${namespace}__${name.substring(1)}`;
+    }
+    return `${namespace}__${name}`;
+  }
+  return name;
+}
+
+export class FederatedLink {
+  // @todo does this need to include import names for every feature or just the namespace?
+  constructor(
+    private readonly url: FederatedLinkUrl,
+    private readonly as: string | null,
+    private readonly imports: FederatedLinkImport[],
+  ) {}
+
+  /** Collects all `@link`s defined in graphql typedefs */
+  static fromTypedefs(typeDefs: DocumentNode): FederatedLink[] {
+    let links: FederatedLink[] = [];
+    for (const definition of typeDefs.definitions) {
+      if (definition.kind === Kind.SCHEMA_EXTENSION || definition.kind === Kind.SCHEMA_DEFINITION) {
+        const defLinks = definition.directives?.filter(
+          directive => directive.name.value === 'link',
+        );
+        const parsedLinks =
+          defLinks?.map(l => linkFromArgs(l.arguments ?? [])).filter(l => l !== undefined) ?? [];
+        links = links.concat(parsedLinks);
+      }
+    }
+    return links;
+  }
+
+  /**
+   * By default, `@link` will assign a prefix based on the name extracted from the URL.
+   * If no name is present, a prefix will not be assigned.
+   * See: https://specs.apollo.dev/link/v1.0/#@link.as
+   */
+  private get namespace(): string | null {
+    return this.as ?? this.url.name;
+  }
+
+  toString(): string {
+    return `@link(url: "${this.url}"${this.as ? `, as: "${this.as}"` : ''}${this.imports.length ? `, import: [${this.imports.join(', ')}]` : ''})`;
+  }
+
+  get defaultImport(): string | null {
+    return this.namespace && `@${this.namespace}`;
+  }
+
+  /** The Link's identity. This is the unique identifier of a `@link`. */
+  get identity(): string {
+    return this.url.identity;
+  }
+
+  supports(version: string): boolean;
+  supports(major: number, minor: number): boolean;
+  supports(version: FederatedLinkUrl): boolean;
+  supports(...args: [string] | [number, number] | [FederatedLinkUrl]): boolean {
+    /** @ts-expect-error: ignore tuple error. These are tuples and can be spread. tsc is wrong. */
+    return this.url.supports(...args);
+  }
+
+  /**
+   * Given the name of an element in a linked schema, this returns the name of that element
+   * as it has been imported. This accounts for aliasing and namespacing unreferenced imports.
+   * This can be used by LinkSpecs to get the translated names of elements.
+   *
+   * @name string The element name in the linked schema. If this is the name of the link (e.g. "example" when linking "https://foo.graphql-hive.com/example"), then this returns the default link import.
+   * @throws if both importName is null and the url has no name.
+   * @returns The name of the element as it has been imported. Note that the directive `@` is stripped from this name to make it easier to match node names when visiting a schema definition.
+   */
+  resolveImportName(elementName: string): string {
+    if (this.url.name && elementName === `@${this.url.name}`) {
+      // @note: default is a directive... So remove the `@`
+      return this.defaultImport!.substring(1);
+    }
+    const imported = this.imports.find(i => i.name === elementName);
+    let resolvedName = imported?.as ?? imported?.name ?? namespaced(this.namespace, elementName);
+    // Strip the `@` prefix for directives because in all implementations of mapping or visiting a schema,
+    // directive names are not prefixed with `@`. The `@` is only for SDL.
+    return resolvedName.startsWith('@') ? resolvedName.substring(1) : resolvedName;
+  }
+}
