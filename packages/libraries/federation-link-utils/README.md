@@ -1,4 +1,4 @@
-# GraphQL Hive - linkable-specs
+# GraphQL Hive - federation-link-utils
 
 [Hive](https://the-guild.dev/graphql/hive) is a fully open-source schema registry, analytics,
 metrics and gateway for [GraphQL federation](https://the-guild.dev/graphql/hive/federation) and

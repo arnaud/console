@@ -1,11 +1,11 @@
 {
-  "name": "@graphql-hive/linkable-specs",
+  "name": "@graphql-hive/federation-link-utils",
   "version": "0.0.1",
   "type": "module",
   "repository": {
     "type": "git",
     "url": "graphql-hive/platform",
-    "directory": "packages/libraries/linkable-specs"
+    "directory": "packages/libraries/federation-link-utils"
   },
   "homepage": "https://the-guild.dev/graphql/hive",
   "author": {
