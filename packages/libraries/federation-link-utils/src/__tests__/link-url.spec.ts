@@ -17,7 +17,7 @@ describe('FederatedLinkUrl', () => {
     ],
     ['https://spec.example.com/v1.0', 'https://spec.example.com', null, 'v1.0'],
     ['https://spec.example.com/vX', 'https://spec.example.com/vX', 'vX', null],
-  ])('fromUrl', (url, identity, name, version) => {
+  ])('fromUrl correctly parses the identity, name, and version', (url, identity, name, version) => {
     const spec = FederatedLinkUrl.fromUrl(url);
     expect(spec.identity).toBe(identity);
     expect(spec.name).toBe(name);
