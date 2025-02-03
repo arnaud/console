@@ -37,27 +37,26 @@ type User {
 // specs.ts
 
 const exampleSpec = new LinkableSpec('https://specs.graphql-hive.com/example', {
-  'v0.1': (resolveImportName) => (typeDefs: DocumentNode) => {
-    const examples: Record<string, string> = {};
-    const exampleName = resolveImportName('@example');
+  'v0.1': resolveImportName => (typeDefs: DocumentNode) => {
+    const examples: Record<string, string> = {}
+    const exampleName = resolveImportName('@example')
     visit(typeDefs, {
       FieldDefinition: node => {
-        const example = node.directives?.find(d => d.name.value === exampleName);
+        const example = node.directives?.find(d => d.name.value === exampleName)
         if (example) {
-          examples[node.name.value] =
-            (
-              example.arguments?.find(a => a.name.value === 'eg')?.value as
-                | StringValueNode
-                | undefined
-            )?.value;
+          examples[node.name.value] = (
+            example.arguments?.find(a => a.name.value === 'eg')?.value as
+              | StringValueNode
+              | undefined
+          )?.value
         }
-      },
-    });
-    return examples;
-  },
-});
-const typeDefs = parse(sdl);
-const linkedSpecs = detectLinkedImplementations(typeDefs, [exampleSpec]);
+      }
+    })
+    return examples
+  }
+})
+const typeDefs = parse(sdl)
+const linkedSpecs = detectLinkedImplementations(typeDefs, [exampleSpec])
 const result = linkedSpecs.map(apply => apply(typeDefs))
 
 // result[0] ==> { user: "query { user { id name } }"}

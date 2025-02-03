@@ -1,4 +1,4 @@
-import { ConstArgumentNode, DocumentNode, Kind, StringValueNode } from 'graphql';
+import { ConstArgumentNode, DocumentNode, Kind } from 'graphql';
 import { FederatedLinkImport } from './link-import';
 import { FederatedLinkUrl } from './link-url';
 
@@ -9,7 +9,11 @@ function linkFromArgs(args: readonly ConstArgumentNode[]): FederatedLink | undef
   for (const arg of args) {
     switch (arg.name.value) {
       case 'url': {
-        url = FederatedLinkUrl.fromUrl((arg.value as StringValueNode).value);
+        if (arg.value.kind === Kind.STRING) {
+          url = FederatedLinkUrl.fromUrl(arg.value.value);
+        } else {
+          console.warn(`Unexpected kind, ${arg.value.kind}, for argument "url" in @link.`);
+        }
         break;
       }
       case 'import': {
@@ -17,11 +21,15 @@ function linkFromArgs(args: readonly ConstArgumentNode[]): FederatedLink | undef
         break;
       }
       case 'as': {
-        as = (arg?.value as StringValueNode | undefined)?.value ?? null;
+        if (arg.value.kind === Kind.STRING) {
+          as = arg.value.value ?? null;
+        } else {
+          console.warn(`Unexpected kind, ${arg.value.kind}, for argument "as" in @link.`);
+        }
         break;
       }
       default: {
-        // console.warn('Unknown argument');
+        // ignore. Federation should validate links.
       }
     }
   }

@@ -39,15 +39,15 @@ export class FederatedLinkUrl {
     if (versionOrName) {
       if (VERSION_MATCH.test(versionOrName)) {
         const maybeName = parts[parts.length - 2];
-        return new this(
+        return new FederatedLinkUrl(
           url.origin + (maybeName ? `/${parts.slice(0, parts.length - 1).join('/')}` : ''),
           maybeName ?? null,
           versionOrName,
         );
       }
-      return new this(`${url.origin}/${parts.join('/')}`, versionOrName, null);
+      return new FederatedLinkUrl(`${url.origin}/${parts.join('/')}`, versionOrName, null);
     }
-    return new this(url.origin, null, null);
+    return new FederatedLinkUrl(url.origin, null, null);
   };
 
   /** Check if this version supports another version */
@@ -69,7 +69,7 @@ export class FederatedLinkUrl {
       major = majorOrVersion.major;
       minor = majorOrVersion.minor;
     } else {
-      throw new Error('Unsupported argument.');
+      throw new Error(`Unsupported version argument: ${args}.`);
     }
     return this.isCompatibleVersion(major, minor);
   }
