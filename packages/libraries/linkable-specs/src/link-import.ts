@@ -1,4 +1,4 @@
-import { ConstValueNode, Kind, StringValueNode } from 'graphql';
+import { ConstValueNode, Kind } from 'graphql';
 
 export class FederatedLinkImport {
   constructor(
