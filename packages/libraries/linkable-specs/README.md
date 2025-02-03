@@ -44,7 +44,7 @@ const exampleSpec = new LinkableSpec('https://specs.graphql-hive.com/example', {
       FieldDefinition: node => {
         const example = node.directives?.find(d => d.name.value === exampleName);
         if (example) {
-          examples[node.name.value;] =
+          examples[node.name.value] =
             (
               example.arguments?.find(a => a.name.value === 'eg')?.value as
                 | StringValueNode
