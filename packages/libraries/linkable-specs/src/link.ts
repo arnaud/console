@@ -100,9 +100,14 @@ export class FederatedLink {
    * as it has been imported. This accounts for aliasing and namespacing unreferenced imports.
    * This can be used by LinkSpecs to get the translated names of elements.
    *
+   * The directive `@` prefix is removed from the returned name. This is to make it easier to match node names when visiting a schema definition.
+   * When visiting nodes, a directive's name doesn't include the `@`.
+   * However, the `@` is necessary for the input parameter in order to know how to correctly resolve the name.
+   * Otherwise, setting the import argument as: import: ["foo"] would incorrectly return `foo` for `@foo`, when it should be `{namespace}__foo`.
+   *
    * @name string The element name in the linked schema. If this is the name of the link (e.g. "example" when linking "https://foo.graphql-hive.com/example"), then this returns the default link import.
    * @throws if both importName is null and the url has no name.
-   * @returns The name of the element as it has been imported. Note that the directive `@` is stripped from this name to make it easier to match node names when visiting a schema definition.
+   * @returns The name of the element as it has been imported.
    */
   resolveImportName(elementName: string): string {
     if (this.url.name && elementName === `@${this.url.name}`) {
