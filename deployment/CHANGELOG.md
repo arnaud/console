@@ -1,5 +1,14 @@
 # hive
 
+## 5.0.1
+
+### Patch Changes
+
+- [#6455](https://github.com/graphql-hive/console/pull/6455)
+  [`6924a1a`](https://github.com/graphql-hive/console/commit/6924a1abf91c1c663d752949031e0a5c4078392a)
+  Thanks [@jasonkuhrt](https://github.com/jasonkuhrt)! - A minor defect in Laboratory has been fixed
+  that previously caused the application to crash when local storage was in a particular state.
+
 ## 5.0.0
 
 ### Major Changes
