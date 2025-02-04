@@ -72,7 +72,7 @@
       "@graphql-hive/core/src/client/collect-schema-coordinates": [
         "./packages/libraries/core/src/client/collect-schema-coordinates.ts"
       ],
-      "@graphql-hive/linkable-specs": ["./packages/libraries/linkable-specs/src/index.ts"],
+      "@graphql-hive/federation-link-utils": ["./packages/libraries/federation-link-utils/src/index.ts"],
       "@hive/usage-ingestor/src/normalize-operation": [
         "./packages/services/usage-ingestor/src/normalize-operation.ts"
       ],
