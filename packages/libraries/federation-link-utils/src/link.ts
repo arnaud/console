@@ -1,6 +1,6 @@
 import { ConstArgumentNode, DocumentNode, Kind } from 'graphql';
-import { FederatedLinkImport } from './link-import';
-import { FederatedLinkUrl } from './link-url';
+import { FederatedLinkImport } from './link-import.js';
+import { FederatedLinkUrl } from './link-url.js';
 
 function linkFromArgs(args: readonly ConstArgumentNode[]): FederatedLink | undefined {
   let url: FederatedLinkUrl | undefined,

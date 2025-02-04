@@ -1,11 +1,11 @@
 import { DocumentNode } from 'graphql';
-import { FederatedLink } from './link';
-import type { LinkableSpec } from './linkable-spec';
+import { FederatedLink } from './link.js';
+import type { LinkableSpec } from './linkable-spec.js';
 
-export * from './link-import';
-export * from './link-url';
-export * from './link';
-export * from './linkable-spec';
+export * from './link-import.js';
+export * from './link-url.js';
+export * from './link.js';
+export * from './linkable-spec.js';
 
 export function detectLinkedImplementations<T>(
   typeDefs: DocumentNode,
